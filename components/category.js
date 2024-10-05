@@ -4,6 +4,7 @@ import LoadingCircle from "@/components/loaddingcircle";
 import Link from "next/link";
 import { useRef, useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -86,9 +87,11 @@ export default function Categories() {
           >
           <Link href={`/products/${categori.name_en}`}>
           
-            <img
+            <Image
               src="/images/images.jpeg"
               alt={categori.name_en}
+              width={250}
+              height={250}
               className="w-[250px] h-40 object-cover rounded-md"
             />
             <div className="mt-4">

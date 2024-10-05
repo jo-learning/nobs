@@ -2,16 +2,18 @@ import { useState, useEffect } from 'react';
 import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 import ConfirmationModal from './confirmationmodal';
 import UpdateModal from './updateitemform';
+import Image from 'next/image';
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import LoadingCircle from './loaddingcircle';
 
-const productsData = [
-  { id: 1, name_en: 'Product 1', image_url: '/image1.jpg', category: 'Category A', price: 20.00, stock_quantity: 15 },
-  { id: 2, name_en: 'Product 2', image_url: '/image2.jpg', category: 'Category B', price: 30.00, stock_quantity: 10 },
-];
+// const productsData = [
+//   { id: 1, name_en: 'Product 1', image_url: '/image1.jpg', category: 'Category A', price: 20.00, stock_quantity: 15 },
+//   { id: 2, name_en: 'Product 2', image_url: '/image2.jpg', category: 'Category B', price: 30.00, stock_quantity: 10 },
+// ];
 
 const ProductTable = () => {
-  const [products, setProducts] = useState(productsData);
+  const [products, setProducts] = useState(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -46,6 +48,13 @@ const ProductTable = () => {
     allProudcts();
   },[]);
 
+  if (products == null)
+    return (
+      <div className="justify-center items-center flex-col">
+        <h1>Loading ....</h1> <LoadingCircle />
+      </div>
+    );
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
@@ -64,7 +73,7 @@ const ProductTable = () => {
             <tr key={product.id} className="border-b hover:bg-gray-50">
               <td className="px-6 py-4 text-gray-800">{product.name_en}</td>
               <td className="px-6 py-4">
-                <img src={product.image_url} alt={product.name_en} className="w-16 h-16 object-cover rounded" />
+                <Image src={product.image_url} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
               </td>
               {/* <td className="px-6 py-4 text-gray-800">{product.category}</td> */}
               <td className="px-6 py-4 text-gray-800">${product.price}</td>

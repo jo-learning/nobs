@@ -94,6 +94,14 @@ export async function getServerSideProps(context) {
       },
     };
   }
+  else if (usercheck.role == 'provider'){
+    return {
+      redirect: {
+        destination: '/dashboardprovider',
+        permanent: false,
+      },
+    };
+  }
 
   // Mock user fetching logic based on authToken
   const user = { id: cookies.authToken };

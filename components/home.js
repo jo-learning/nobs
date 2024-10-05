@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import en from '../locales/en/common.json';
 import ti from '../locales/ti/common.json';
 
@@ -90,9 +91,11 @@ export default function Home() {
           >
           <Link href={`/productdetail/${product.id}`}>
           
-            <img
+            <Image
               src={product.image_url}
               alt={product.name}
+              width={250}
+              height={250}
               className="w-[250px] h-40 object-cover rounded-md"
             />
             <div className="mt-4">

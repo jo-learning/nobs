@@ -4,18 +4,37 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { FiMenu } from "react-icons/fi";
 import { SlArrowDown, SlArrowUp } from "react-icons/sl";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PriceFilter from "./pricefilter";
 
 export default function Layout({ children }) {
   const pathname = usePathname();
   const [isAsideOpen, setAsideOpen] = useState(false);
   const [categoryclick, setCategoryClick] = useState(true);
+  const [categorycl, setcategorycl] = useState(true)
+  const [category, setcategory] = useState(null)
   const [productclick, setProductClick] = useState(true);
   const toggleAside = () => setAsideOpen(!isAsideOpen);
   const [items, setItems] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  useEffect(()=>{
+    const fetchProduct = async () => {
+      try {
+        const res = await fetch("/api/category/allcategory");
+        const data = await res.json();
+        if (res.ok) {
+          const newdata = data.allCategory;
+        //   console.log(newdata);
+          setcategory(newdata);
+        } else {
+          toast.error("0 products are there");
+        }
+      } catch {
+        toast.error("Connection Error");
+      }
+    };
+    fetchProduct();
+  },[])
   const fetchFilteredItems = async (minPrice, maxPrice) => {
     try {
     setLoading(true)
@@ -74,6 +93,42 @@ export default function Layout({ children }) {
             {categoryclick && (
               <ul>
                 <PriceFilter onFilter={fetchFilteredItems} />
+              </ul>
+            )}
+            </div>
+           
+
+          </ul>
+          <ul>
+            <div className="border-b-2">
+            <li className="w-full">
+              <button
+                className="w-full justify-between text-start"
+                onClick={() => {
+                  setcategorycl(!categorycl);
+                }}
+              >
+                <span
+                  className={clsx("block py-2 px-4 flex justify-between items-center")}
+                >
+                  Categories
+                  {categorycl ? <SlArrowUp /> : <SlArrowDown />}
+                </span>
+              </button>
+            </li>
+            {categorycl && (
+              <ul>
+                {
+                  category && (
+                    
+                      category.map((cate, index)=>(
+                        <li key={index} className="ml-6 mb-2 hover:bg-gray-500 p-2 rounded-lg">
+                          <a href={`/products/${cate.name_en}`}>{cate.name_en}</a>
+                        </li>
+                      ))
+                    
+                  )
+                }
               </ul>
             )}
             </div>

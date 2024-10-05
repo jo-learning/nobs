@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 import { setCartCounter } from "@/store/userSlice";
+import Link from "next/link";
 
 export default function Cart() {
   const user = useSelector((state) => state.user.userInfo);
@@ -53,6 +54,10 @@ export default function Cart() {
       localStorage.setItem("cartcounter", parseInt(cartCounter)-1);
       dispatch(setCartCounter(parseInt(cartCounter)-1));
     } else {
+      const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+      const updatedCart= localCart.filter(dir => dir.id !== id);
+      localStorage.setItem('cart', JSON.stringify(updatedCart))
+      setCartItems(updatedCart);
       toast.error(data.message);
     }
   };
@@ -74,6 +79,10 @@ export default function Cart() {
         // console.log(router.query)
         if (res.ok) {
           setCartItems(data.cartitem);
+        }
+        else{
+          const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+          setCartItems(localCart);
         }
       } catch (e) {
         console.log(e);
@@ -127,11 +136,7 @@ export default function Cart() {
           )}
         </div>
         {/* Summary Section */}
-        {user == null ? (
-          <button onClick={() => router.push('/login')} className="mt-6 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
-            You have to login first
-          </button>
-        ) : (
+        
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-2">
@@ -153,11 +158,10 @@ export default function Cart() {
               <span>Total:</span>
               <span>${(calculateTotal() + 5.99 + 2.5).toFixed(2)}</span>
             </div>
-            <button className="mt-6 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
+            <Link href={{pathname: '/checkout'}} className="mt-6 w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
               Proceed to Checkout
-            </button>
+            </Link>
           </div>
-        )}
       </div>
       <ToastContainer />
     </div>

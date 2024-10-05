@@ -58,7 +58,6 @@
 
 
 
-
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -92,7 +91,7 @@ const Slider = () => {
   }, [slides.length]);
 
   return (
-    <div className="relative w-full h-[500px] overflow-hidden">
+    <div className="relative w-full h-[500px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={index}
@@ -101,18 +100,19 @@ const Slider = () => {
           }`}
         >
           {/* Image */}
-          {/* <img src={slide.image} alt={slide.text} className="w-full h-full object-cover" /> */}
           <Image 
-          src={slide.image}
-          alt={slide.text}
-          width={1500}
-          height={100}
-          className=''
+            src={slide.image}
+            alt={slide.text}
+            width={1500} // Fixed width for now
+            height={500} // You can adjust this based on the image
+            className="object-cover w-full h-full" // Ensure image covers the entire container
           />
 
           {/* Overlay text */}
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <h2 className="text-white text-3xl font-bold">{slide.text}</h2>
+            <h2 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
+              {slide.text}
+            </h2>
           </div>
         </div>
       ))}

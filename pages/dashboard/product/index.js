@@ -2,6 +2,7 @@
 import ProductTable from '@/components/producttable';
 import Layout from '../../../components/layout';
 import cookie from 'cookie';
+import { redirect } from 'next/dist/server/api-utils';
 
 export default function Product(){
     return (
@@ -49,6 +50,14 @@ if (usercheck.role == 'user'){
       permanent: false,
     },
   };
+}
+else if (usercheck.role == 'provider'){
+  return {
+    redirect: {
+      destination: '/dashboardprovider',
+      permanent: false
+    }
+  }
 }
 
 // Mock user fetching logic based on authToken

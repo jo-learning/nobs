@@ -241,6 +241,33 @@ export const searchProduct = async(req, res) =>{
 }
 
 
+export const searchProducts = async(req, res) =>{
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Only POST method allowed" });
+  }
+  const { search } = req.body;
+  if (!search) {
+    return res.status(400).json({ error: 'Please provide a search term' });
+  }
+
+  try {
+    const allProducts = await Product.findAll({
+      where: {
+        [Op.or]: [
+          { name_en: { [Op.like]: `%${search}%` } },
+          { description_en: { [Op.like]: `%${search}%` } }
+        ]
+      }
+    });
+
+    res.status(200).json({message: "all searched products",allProducts});
+  } catch (error) {
+    res.status(500).json({ message: "service error" });
+  }
+
+}
+
+
 
 export default {
   create,
@@ -249,5 +276,6 @@ export default {
   getProductByCategory,
   deleteProduct,
   searchProduct,
-  getProviderProduct
+  getProviderProduct,
+  searchProducts
 };

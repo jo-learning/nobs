@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setRole } from '@/store/userSlice';
+import Image from 'next/image';
 
 const LoginAvatar = ({ name, avatarUrl, handlelogout }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +29,13 @@ const LoginAvatar = ({ name, avatarUrl, handlelogout }) => {
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
+    if (isOpen){
+      const Role = localStorage.getItem("role");
+      console.log(Role)
+    if (Role){
+      dispatch(setRole(JSON.parse(Role)))
+    }
+    }
   };
 
   return (
@@ -36,7 +44,7 @@ const LoginAvatar = ({ name, avatarUrl, handlelogout }) => {
         usercheck == 'user' && (
           <div className="flex flex-row items-center justify-center bg-gray-100 bottom-0">
         <div className="w-12 h-12 rounded-full overflow-hidden border-4 border-gray-200 cursor-pointer" onClick={toggleDropdown}>
-          <img src={avatarUrl} alt={`${name}'s Avatar`} className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt={`${name}'s Avatar`} className="w-full h-full object-cover" />
         </div>
         <h2 className="mt-4 text-xl font-semibold text-gray-800 hidden sm:flex">{name}</h2>
 
@@ -70,7 +78,7 @@ const LoginAvatar = ({ name, avatarUrl, handlelogout }) => {
         usercheck == 'admin' && (
           <div className="flex flex-row items-center justify-center bg-gray-100 bottom-0">
         <div className="w-12 h-12 rounded-full overflow-hidden border-4 border-gray-200 cursor-pointer" onClick={toggleDropdown}>
-          <img src={avatarUrl} alt={`${name}'s Avatar`} className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt={`${name}'s Avatar`} className="w-full h-full object-cover" />
         </div>
         <h2 className="mt-4 text-xl font-semibold text-gray-800 hidden sm:flex">{name}</h2>
 
@@ -110,7 +118,7 @@ const LoginAvatar = ({ name, avatarUrl, handlelogout }) => {
         usercheck == 'provider' && (
           <div className="flex flex-row items-center justify-center bg-gray-100 bottom-0">
         <div className="w-12 h-12 rounded-full overflow-hidden border-4 border-gray-200 cursor-pointer" onClick={toggleDropdown}>
-          <img src={avatarUrl} alt={`${name}'s Avatar`} className="w-full h-full object-cover" />
+          <Image src={avatarUrl} alt={`${name}'s Avatar`} className="w-full h-full object-cover" />
         </div>
         <h2 className="mt-4 text-xl font-semibold text-gray-800 hidden sm:flex">{name}</h2>
 

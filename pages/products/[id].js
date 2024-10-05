@@ -16,13 +16,18 @@ export default function Home() {
   
   useEffect(() => {
     const fetchProduct = async () => {
+      console.log(id);
       try {
         const res = await fetch(`/api/products/${id}`);
         const data = await res.json();
         if (res.ok) {
             const newdata = data.product;
             // console.log(newdata)
-          setProducts(newdata);
+            if(newdata){
+          setProducts(newdata);}
+          else{
+            setProducts(data.allProduct)
+          }
 
         } else {
           toast.error("0 products are there");
@@ -32,7 +37,7 @@ export default function Home() {
       }
     };
     fetchProduct();
-  }, [router.isReady]);
+  }, [router.isReady, id]);
 
   if (products == null)
     return (

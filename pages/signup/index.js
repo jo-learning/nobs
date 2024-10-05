@@ -133,7 +133,7 @@ export default function Signup() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="text-black w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your password"
+              placeholder="Enter your phone number"
             />
           </div>
 

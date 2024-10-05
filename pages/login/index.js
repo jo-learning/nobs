@@ -38,6 +38,8 @@ export default function Login() {
       // localStorage.setItem("token", data.token);
       // console.log(data.user)
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      localStorage.setItem("role", JSON.stringify(data.user.role))
       
       dispatch(setUser(data.user))
 

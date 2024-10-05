@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 export default function Products({ items, product }) {
@@ -25,9 +26,11 @@ export default function Products({ items, product }) {
           >
           <Link href={`/productdetail/${product.id}`}>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               src={product.image_url}
               alt={product.name}
+              width={250}
+              height={250}
               className="w-[250px] h-40 object-cover rounded-md"
             />
             </div>
@@ -61,9 +64,11 @@ export default function Products({ items, product }) {
           >
           <Link href={`/productdetail/${product.id}`}>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               src={product.image_url}
               alt={product.name}
+              width={250}
+              height={250}
               className="w-[250px] h-40 object-cover rounded-md"
             />
             </div>

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Link from "next/link";
 import { FaSearch } from "react-icons/fa";
 import ShoppingCartButton from "./shoppingcartbutton";
@@ -9,15 +9,16 @@ import ti from "../locales/ti/common.json";
 import CategoryDropdown from "./categorylist";
 import LoginAvatar from "./loginavatar";
 import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser, clearUser, setCartCounter} from '../store/userSlice';
+import { useDispatch, useSelector } from "react-redux";
+import { setUser, clearUser, setCartCounter } from "../store/userSlice";
 
 export default function Header() {
   const { locale } = useRouter();
-  const router  = useRouter();
+  const router = useRouter();
   const dispatch = useDispatch();
   const users = useSelector((state) => state.user.userInfo);
   const cart = useSelector((state) => state.user.cartcounter);
+  const [inputValue, setInputValue] = useState("");
   const tanslations = locale === "en" ? en : ti;
   const [shoppingcartcounter, setshoppingcartcounter] = useState(0);
 
@@ -26,32 +27,39 @@ export default function Header() {
   useEffect(() => {
     const userData = localStorage.getItem("user");
     // const cartCounter = localStorage.getItem("cartcounter");
-    if (userData){
+    if (userData) {
       dispatch(setUser(JSON.parse(userData)));
     }
     // if (cartCounter){
     //   dispatch(setUser(JSON.parse(cartCounter)));
 
     // }
-    const handleCartforcounter = async() => {
+    
+    const handleCartforcounter = async () => {
       const res = await fetch("/api/cart/getcartforcounter");
       const data = await res.json();
-      if (res.ok){
+      if (res.ok) {
         localStorage.setItem("cartcounter", data.cartitem.length);
-        dispatch(setCartCounter(data.cartitem.length))
+        dispatch(setCartCounter(data.cartitem.length));
       }
-    }
+    };
     handleCartforcounter();
 
     // console.log(users)
   }, []);
+
+
+
+  // const handlesearch = async() =>{
+  //   router.replace(`/search/${inputValue}`);
+  // }
 
   const handleLogout = async () => {
     await fetch("/api/users/logout", {
       method: "POST",
     });
     localStorage.removeItem("user");
-    dispatch(clearUser())
+    dispatch(clearUser());
     router.push("/"); // Redirect to login page after logout
   };
 
@@ -90,13 +98,21 @@ export default function Header() {
             <ul className="flex space-x-4">
               <CategoryDropdown />
               <li className=" hidden sm:flex">
-                <input className="mr-2 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-black w-full px-4 py-2 border border-gray-300 rounded-lg" />
+                <input
+                  className="mr-2 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-black w-full px-4 py-2 border border-gray-300 rounded-lg"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                />
+                <a href={`/search/${inputValue}`}>
                 <button
                   className="flex-shrink-0 text-gray-500 hover:text-gray-700"
+                  // onClick={()=> {handlesearch() }}
                   type="button"
                 >
+                  
                   <FaSearch size={20} />
                 </button>
+                </a>
                 <LanguageSwitcher />
               </li>
               <li className="mt-2">
@@ -115,7 +131,7 @@ export default function Header() {
               ) : (
                 <LoginAvatar handlelogout={handleLogout} />
               )}
-                {/* <LoginAvatar handlelogout={handleLogout} /> */}
+              {/* <LoginAvatar handlelogout={handleLogout} /> */}
             </ul>
           </nav>
         </div>

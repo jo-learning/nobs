@@ -4,6 +4,7 @@ import ConfirmationModal from './confirmationmodal';
 import UpdateModal from './updateitemform';
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import Image from 'next/image';
 
 const productsData = [
   { id: 1, name_en: 'Product 1', image_url: '/image1.jpg', category: 'Category A', price: 20.00, stock_quantity: 15 },
@@ -66,7 +67,8 @@ const ProductTable = () => {
             <tr key={product.id} className="border-b hover:bg-gray-50">
               <td className="px-6 py-4 text-gray-800">{product.name_en}</td>
               <td className="px-6 py-4">
-                <img src={product.image_url} alt={product.name_en} className="w-16 h-16 object-cover rounded" />
+                {/* <img src={product.image_url} alt={product.name_en} className="w-16 h-16 object-cover rounded" /> */}
+                <Image src={product.image_url} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
               </td>
               {/* <td className="px-6 py-4 text-gray-800">{product.category}</td> */}
               <td className="px-6 py-4 text-gray-800">${product.price}</td>

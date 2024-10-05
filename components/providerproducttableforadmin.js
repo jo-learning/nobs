@@ -3,6 +3,7 @@ import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 import ConfirmationModal from './confirmationmodal';
 import UpdateModal from './updateitemform';
 import { ToastContainer, toast } from 'react-toastify';
+import Image from 'next/image';
 import "react-toastify/dist/ReactToastify.css";
 
 const productsData = [
@@ -15,7 +16,7 @@ const ProductTable = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isuser, setisuser] = useState(null);
+  const [isusers, setisusers] = useState(null);
   const [indexs, setindexs] = useState(0);
 
   const handleDelete = async(id) => {
@@ -46,7 +47,7 @@ const ProductTable = () => {
       if (data.allProduct){
         console.log(data.user)
       setProducts(data.allProduct)
-      setisuser(data.user)
+      setisusers(data.user)
     }
       
     }
@@ -60,7 +61,8 @@ const ProductTable = () => {
           <tr>
             <th className="px-6 py-3 text-left text-gray-600">Product Name</th>
             <th className="px-6 py-3 text-left text-gray-600">Image</th>
-            <th className="px-6 py-3 text-left text-gray-600">Email</th>
+            {isusers && (<th className="px-6 py-3 text-left text-gray-600">Email</th>)}
+            
 
             {/* <th className="px-6 py-3 text-left text-gray-600">Category</th> */}
             <th className="px-6 py-3 text-left text-gray-600">Price</th>
@@ -73,10 +75,11 @@ const ProductTable = () => {
             <tr key={product.id} className="border-b hover:bg-gray-50">
               <td className="px-6 py-4 text-gray-800">{product.name_en}</td>
               <td className="px-6 py-4">
-                <img src={product.image_url} alt={product.name_en} className="w-16 h-16 object-cover rounded" />
+                <Image src={product.image_url} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
               </td>
               {/* <td className="px-6 py-4 text-gray-800">{product.category}</td> */}
-              <td className="px-6 py-4 text-gray-800">{isuser[index].email}</td>
+              {isusers && (<td className="px-6 py-4 text-gray-800">{isusers[index].email}</td>)}
+              
               {/* <td className="px-6 py-4 text-gray-800">aa</td> */}
               <td className="px-6 py-4 text-gray-800">${product.price}</td>
               <td className="px-6 py-4 text-gray-800">{product.stock_quantity}</td>

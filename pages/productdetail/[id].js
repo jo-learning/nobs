@@ -39,6 +39,24 @@ export default function ProductDetailPage() {
     productById();
   }, [router.isReady]);
 
+
+  // Function to add item to cart
+const addToCart = (item) => {
+  // const isUserLoggedIn = Boolean(user); // Check if the user is logged in
+
+  // if (isUserLoggedIn) {
+  //   // User is logged in, add item to the database
+  //   saveCartToDatabase(item);
+  // } else {
+    // User is not logged in, add item to localStorage
+    const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+    if (!localCart.some(dir => dir.id === item.id)){
+    localCart.push(item);
+    localStorage.setItem('cart', JSON.stringify(localCart));}
+  // }
+};
+
+
   const handleAddToCart = async() => {
     // Handle adding to cart logic
     console.log(`Added ${quantity} items to cart`);
@@ -60,6 +78,7 @@ export default function ProductDetailPage() {
       dispatch(setCartCounter(parseInt(cartCounter)+1));
     }
     else{
+      addToCart({id: product.id, name: product.name_en, price: product.price, image: product.image_url, quantity})
       toast.error(data.message)
       console.log(data)
 
