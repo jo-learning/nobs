@@ -158,6 +158,7 @@ export default function Checkout() {
   // Handle confirming transaction number
   const handleConfirmTransaction = async () => {
     if (transactionNumber) {
+      setLoading(true)
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -178,13 +179,16 @@ export default function Checkout() {
         setTransactionId(data.transaction_id.id);
         setShowTransactionModal(false);
         setShowOrderModal(true);
+        setLoading(false)
       } else {
         toast.error(data.message);
         setShowTransactionModal(false);
+        setLoading(false)
       }
     } else {
       alert("Please enter a transaction number.");
       setShowTransactionModal(false);
+      setLoading(false)
     }
     // Proceed with the order
   };
@@ -389,7 +393,15 @@ export default function Checkout() {
             <button
               onClick={handleConfirmTransaction}
               className="bg-blue-500 text-white py-3 px-6 w-full rounded-md hover:bg-blue-600"
+              disabled={loading}
             >
+            <ClipLoader
+                color="#ffffff"
+                loading={loading}
+                size={35}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
               Confirm Transaction
             </button>
           </div>

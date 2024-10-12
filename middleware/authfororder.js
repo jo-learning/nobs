@@ -19,6 +19,7 @@ export const authenticatefororders = (handler) => async (req, res) => {
         if (!authToken) {
           if (userId){
             req.session = userId;
+            req.user = {id :"0001"};
   
             // Proceed to the handler (controller)
             // console.log(userId);

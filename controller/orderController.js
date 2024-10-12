@@ -26,10 +26,6 @@ export const create = async (req, res) => {
   }
   // console.log(cartItems)
   const user_id = req.user.id
-  let user = "0001"
-  if (user_id){
-    user = user_id;
-  }
   
 
   const subtotal = cartItems.reduce(
@@ -60,7 +56,7 @@ export const create = async (req, res) => {
     // Create new category
     const newOrder = await Order.create({
       id: order_id,
-      user_id: user,
+      user_id,
       total_price,
       shipping_address,
       transaction_number,
