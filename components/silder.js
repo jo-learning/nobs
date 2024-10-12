@@ -66,15 +66,15 @@ const Slider = () => {
   const slides = [
     {
       image: '/images/images.jpeg',
-      text: 'This is Slide 1',
+      text: 'Shop the Latest Trends! 🌟 Explore Our New Arrivals!',
     },
     {
       image: '/images/images 1.webp',
-      text: 'This is Slide 2',
+      text: 'Unleash Your Style! 👗 Find Your Perfect Outfit Today!',
     },
     {
       image: '/images/ecommerce.png',
-      text: 'This is Slide 3',
+      text: 'Big Savings Await! 🛒 Don\'t Miss Our Exclusive Deals!',
     },
   ];
 
@@ -110,7 +110,7 @@ const Slider = () => {
 
           {/* Overlay text */}
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <h2 className="text-white text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold">
+            <h2 className="text-white text-3xl sm:text-2xl md:text-3xl lg:text-4xl font-bold px-7">
               {slide.text}
             </h2>
           </div>

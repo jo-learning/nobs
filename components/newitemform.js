@@ -13,10 +13,10 @@ export default function NewItemForm() {
     categoryId: "",
     price: "",
   });
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+  
+  const [images, setImages] = useState([]); // This will hold the image file and color for each image
+  const [preview, setPreview] = useState([]); // To store image previews
   const [categories, setCategories] = useState(null);
-  const [categoriestest, setCategoriesTest] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -27,13 +27,10 @@ export default function NewItemForm() {
         const data = await res.json();
         if (res.ok) {
           setCategories(data.allCategory);
-          // console.log(data.allCategory)
         } else {
-          // setError('Failed to fetch categories');
           console.log("data not there");
         }
       } catch (err) {
-        // setError('Error fetching categories');
         console.log("Error", err);
       } finally {
         setLoading(false);
@@ -48,61 +45,88 @@ export default function NewItemForm() {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+    const files = Array.from(e.target.files);
+    const newImages = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file), // Set preview URL
+      color: "", // Initialize with an empty color
+    }));
+    setImages((prevImages) => [...prevImages, ...newImages]); // Add the new images to existing ones
+  };
+
+  const handleColorChange = (e, index) => {
+    const newColor = e.target.value;
+    setImages((prevImages) => {
+      const updatedImages = [...prevImages];
+      updatedImages[index].color = newColor; // Update the color for the specific image
+      return updatedImages;
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    if (image == null) {
-      toast.error("add an image");
+
+    if (images.length === 0) {
+      toast.error("Please add at least one image");
       setLoading(false);
       return;
     }
+
     const imageData = new FormData();
-    imageData.append("image", image);
-    const re = await fetch("/api/upload", {
-      method: "POST",
-      body: imageData,
+    const colorData = []
+    images.forEach((img) => {
+      imageData.append("images", img.file);
+      imageData.append("colors", img.color);
+      colorData.push(img.color);
     });
-    const redata = await re.json();
-    if (redata.filePath) {
-      const imageUrl = redata.filePath;
-      const res = await fetch("/api/products", {
+
+    try {
+      const res = await fetch("/api/upload", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        credentials: 'include',
-        body: JSON.stringify({ data:formData, imageUrl }),
+        body: imageData,
       });
+      console.log(colorData)  
+      const redata = await res.json();
 
-      const data = await res.json();
+      if (redata.filePaths) {
+        const imageUrl = redata.filePaths; // Assuming this is an array of uploaded image URLs
+        const res = await fetch("/api/products", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ data: formData, imageUrl, colorData }),
+        });
 
-      if (res.ok) {
-        // If login is successful, store the token and redirect
-        localStorage.setItem("token", data.token);
-        toast.success(data.message);
-        // router.push("/dashboard"); // Redirect to a protected page after login
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem("token", data.token);
+          toast.success(data.message);
+        } else {
+          toast.error(data.message);
+        }
       } else {
-        // setError(data.message || "An error occurred");
-        toast.error(data.message);
+        toast.error("Image upload failed. Please try again.");
       }
-    } else {
-      toast.error("image not uploaded Try again");
-      return;
+    } catch (error) {
+      toast.error("An error occurred during upload.");
+    } finally {
+      setLoading(false);
     }
   };
-  if (categories == null)
+
+  if (categories == null) {
     return (
       <>
         <h1 className="text-2xl text-center font-bold">
-          you have to create category first
+          You have to create a category first.
         </h1>
       </>
     );
+  }
 
   return (
     <>
@@ -132,7 +156,7 @@ export default function NewItemForm() {
             />
           </div>
 
-          {/* Name in Spanish */}
+          {/* Name in Tigrigna */}
           <div>
             <label
               htmlFor="nameTg"
@@ -146,7 +170,7 @@ export default function NewItemForm() {
               name="nameTg"
               value={formData.nameTg}
               onChange={handleChange}
-              placeholder="Ingrese el nombre del artículo en español"
+              placeholder="Enter the item name in Tigrigna"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
@@ -178,14 +202,14 @@ export default function NewItemForm() {
               htmlFor="descriptionTg"
               className="block text-gray-700 font-semibold mb-2"
             >
-              Descripción (Tigrigna)
+              Description (Tigrigna)
             </label>
             <textarea
               id="descriptionTg"
               name="descriptionTg"
               value={formData.descriptionTg}
               onChange={handleChange}
-              placeholder="Ingrese la descripción del artículo en español"
+              placeholder="Enter the item description in Tigrigna"
               rows="4"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
@@ -227,26 +251,13 @@ export default function NewItemForm() {
                 name="stockQuantity"
                 value={formData.stockQuantity}
                 onChange={handleChange}
-                placeholder="Enter the price"
+                placeholder="Enter the stock quantity"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
           </div>
 
-          {/* Image URL
-        <div>
-          <label htmlFor="image" className="block text-gray-700 font-semibold mb-2">Image URL</label>
-          <input
-            type="text"
-            id="image"
-            name="image"
-            value={formData.image}
-            onChange={handleChange}
-            placeholder="Enter the image URL"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div> */}
           {/* Categories */}
           <div>
             <label
@@ -273,63 +284,57 @@ export default function NewItemForm() {
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name_en}{" "}
-                  {/* Change this to nameTg or whichever field you need */}
                 </option>
               ))}
             </select>
           </div>
 
           {/* Image Upload */}
-
           <div>
-            <h2 className="text-2xl font-bold mb-6">Upload an Image</h2>
+            <h2 className="text-2xl font-bold">Upload Images</h2>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
+              className="mt-4 mb-4"
+            />
 
-            <div className="mb-4">
-              <label
-                htmlFor="file-upload"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Choose Image
-              </label>
-              <input
-                id="file-upload"
-                type="file"
-                name="image"
-                onChange={handleImageChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
+            {/* Displaying Images with Color Pickers */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {images.map((img, index) => (
+                <div key={index} className="mb-4">
+                  <Image
+                    src={img.preview}
+                    alt={`Image ${index}`}
+                    width={100}
+                    height={100}
+                    className="rounded-md shadow-md"
+                  />
+                  <input
+                    type="color"
+                    value={img.color}
+                    onChange={(e) => handleColorChange(e, index)}
+                    className="mt-2"
+                  />
+                </div>
+              ))}
             </div>
-
-            {preview && (
-              <div className="mb-4">
-                <Image
-                  src={preview}
-                  alt="Image Preview"
-                  width={100}
-                  height={100}
-                  className="rounded-md shadow-md"
-                />
-              </div>
-            )}
-
-            {/* <button
-            type="submit"
-            className=" bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          >
-            Upload Image
-          </button> */}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
           >
-            Add Item
+            {loading ? "Loading..." : "Submit"}
           </button>
         </form>
+        <ToastContainer />
       </div>
-      <ToastContainer />
     </>
   );
 }

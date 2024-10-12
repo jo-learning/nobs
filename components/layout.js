@@ -61,13 +61,13 @@ export default function Layout({ children }) {
             {categoryclick && (
               <ul>
                 <li>
-                  <Link href="/dashboard/addcategory">
+                  <Link href="/dashboard/category">
                     <span
                       className={clsx(
                         "block py-2 px-4 hover:bg-gray-700 ml-2",
                         {
                           "bg-slate-600 rounded-lg":
-                            pathname === "/dashboard/TBA",
+                            pathname === "/dashboard/category",
                         }
                       )}
                     >

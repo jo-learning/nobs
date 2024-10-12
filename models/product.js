@@ -35,7 +35,11 @@ const Product = sequelize.define(
       allowNull: false,
     },
     image_url: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSON,
+      allowNull: false,
+    },
+    color: {
+      type: DataTypes.JSON,
       allowNull: false,
     },
     category_id: {

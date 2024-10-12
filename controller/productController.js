@@ -25,7 +25,8 @@ export const create = async (req, res) => {
     price,
     stockQuantity,
   } = req.body.data;
-  const imageUrl = req.body.imageUrl;    
+  const imageUrl = req.body.imageUrl;  
+  const color = req.body.colorData  
   console.log(imageUrl)
 
   if (
@@ -72,6 +73,7 @@ export const create = async (req, res) => {
       category_id: categoryId,
       stock_quantity: stockQuantityFloat,
       image_url: imageUrl,
+      color
     });
 
     res.status(201).json({

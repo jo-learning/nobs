@@ -52,9 +52,10 @@ export const register = async (req, res) => {
             user_id: id
         })
         // Generate JWT token
-        const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, {
-            expiresIn: '1h',
-        });
+        // const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET, {
+        //     expiresIn: '1h',
+        // });
+        const token = jwt.sign({ id: newUser.id, email: newUser.email, role: newUser.role }, JWT_SECRET);
         // Set HttpOnly cookie with the token
     res.setHeader('Set-Cookie', [cookie.serialize('authToken', token, {
         httpOnly: true,
@@ -111,9 +112,7 @@ export const login = async (req, res) => {
         }
 
         // Generate JWT token
-        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, {
-            expiresIn: '1h',
-        });
+        const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET);
         // Set HttpOnly cookie with the token
     res.setHeader('Set-Cookie', [cookie.serialize('authToken', token, {
         httpOnly: true,
@@ -166,8 +165,33 @@ export const logout = async(req, res) => {
   }
 
 
+// Login user
+export const getuser = async (req, res) => {
+    if (req.method !== 'GET') {
+        return res.status(405).json({ message: 'Only GET method allowed' });
+    }
+    const id = req.user.id;
+    try {
+        // Check if user exists
+        const user = await User.findOne({ where: { id } });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid user' });
+        }
+    
+
+        res.status(200).json({
+            message: 'Login successful',
+            user: {first_name: user.first_name,last_name: user.last_name, email: user.email, phone: user.phone},
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 export default {
     register,
     login,
-    logout
+    logout,
+    getuser
 };

@@ -30,7 +30,7 @@ export default function Home() {
           }
 
         } else {
-          toast.error("0 products are there");
+          // toast.error("0 products are there");
         }
       } catch {
         toast.error("Connection Error");

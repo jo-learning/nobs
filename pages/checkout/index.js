@@ -1,30 +1,36 @@
-import { useState, useEffect } from 'react';
-import Image from 'next/image';
-import cookie from 'cookie'
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import cookie from "cookie";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
+import { ClipLoader } from "react-spinners";
 
 export default function Checkout() {
   const [cartItems, setCartItems] = useState([]);
   const [billingDetails, setBillingDetails] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState(''); // Selected payment method
+  const [paymentMethod, setPaymentMethod] = useState(""); // Selected payment method
   const [showTransactionModal, setShowTransactionModal] = useState(false); // Show modal for transaction number
-  const [transactionNumber, setTransactionNumber] = useState(''); // Transaction number input
+  const [showOrderModal, setShowOrderModal] = useState(false); // Show modal for transaction number
+  const [transactionNumber, setTransactionNumber] = useState(""); // Transaction number input
   const [errors, setErrors] = useState({}); // To hold billing form validation errors
+  const [transactionid, setTransactionId] = useState(null);
+  const [emailMessage, setEmailMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [userDetaillock, setUserDetailLock] = useState(false);
   const shippingCost = 5.99;
-  const taxes = 2.50;
+  const taxes = 2.5;
 
   const otherPayments = [
-    { id: 1, name: 'Apple Pay', img: '/applepay.png' },
-    { id: 2, name: 'Google Pay', img: '/googlepay.png' },
-    { id: 3, name: 'Bitcoin', img: '/bitcoin.png' },
+    { id: 1, name: "Telebirr", img: "/images/telebirr.jpeg" },
+    { id: 2, name: "CBE", img: "/images/CBE.jpeg" },
+    { id: 3, name: "Other Banks", img: "/bitcoin.png" },
   ];
 
   // Function to calculate the total price
@@ -33,7 +39,7 @@ export default function Checkout() {
       (total, item) => total + item.price * item.quantity,
       0
     );
-    const total = subtotal + taxes + shippingCost;
+    const total = subtotal;
     return total;
   };
 
@@ -44,6 +50,21 @@ export default function Checkout() {
         const data = await res.json();
         if (res.ok) {
           setCartItems(data.cartitem);
+        } else {
+          const localCart = JSON.parse(localStorage.getItem("cart")) || [];
+          setCartItems(localCart);
+        }
+        const res2 = await fetch(`/api/userget`);
+        const data2 = await res2.json();
+        if (res2.ok) {
+          setBillingDetails({
+            firstName: data2.user.first_name,
+            lastName: data2.user.last_name,
+            email: data2.user.email,
+            phoneNumber: data2.user.phone,
+            address: "",
+          });
+          setUserDetailLock(true);
         }
       } catch (e) {
         console.log(e);
@@ -65,14 +86,14 @@ export default function Checkout() {
   const validateBillingDetails = () => {
     let formErrors = {};
     const requiredFields = [
-      'firstName',
-      'lastName',
-      'email',
-      'phoneNumber',
-      'address',
-      'city',
-      'state',
-      'zipCode',
+      "firstName",
+      "lastName",
+      "email",
+      "phoneNumber",
+      "address",
+      // 'city',
+      // 'state',
+      // 'zipCode',
     ];
 
     requiredFields.forEach((field) => {
@@ -84,16 +105,49 @@ export default function Checkout() {
     setErrors(formErrors);
     return Object.keys(formErrors).length === 0;
   };
+  // email validate
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
 
   // Handle placing order
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
+    setLoading(true);
+    setEmailMessage("");
     if (!validateBillingDetails()) {
       // If validation fails, do not proceed
+      setLoading(false);
       return;
+    }
+    if (!isValidEmail(billingDetails.email)) {
+      setEmailMessage("invaild email format");
+      setLoading(false);
+      return;
+    } else {
+      setEmailMessage("");
+      const response = await fetch("/api/verifyemail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: billingDetails.email }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setEmailMessage("");
+        setLoading(false);
+      } else {
+        setEmailMessage("Email is invalid.");
+        setLoading(false);
+        return;
+      }
     }
 
     if (!paymentMethod) {
-      alert('Please select a payment method.');
+      alert("Please select a payment method.");
       return;
     }
 
@@ -102,15 +156,37 @@ export default function Checkout() {
   };
 
   // Handle confirming transaction number
-  const handleConfirmTransaction = () => {
-    if (!transactionNumber) {
-      alert('Please enter a transaction number.');
-      return;
+  const handleConfirmTransaction = async () => {
+    if (transactionNumber) {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cartItems,
+          shipping_address: billingDetails,
+          transaction_number: transactionNumber,
+          paymentMethod,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        // setShowTransactionModal(false);
+        console.log(data);
+        toast.success(data.message);
+        setTransactionId(data.transaction_id.id);
+        setShowTransactionModal(false);
+        setShowOrderModal(true);
+      } else {
+        toast.error(data.message);
+        setShowTransactionModal(false);
+      }
+    } else {
+      alert("Please enter a transaction number.");
+      setShowTransactionModal(false);
     }
-
     // Proceed with the order
-    alert(`Order placed with payment method: ${paymentMethod} and transaction number: ${transactionNumber}`);
-    setShowTransactionModal(false);
   };
 
   return (
@@ -129,44 +205,59 @@ export default function Checkout() {
                   type="text"
                   name="firstName"
                   placeholder="First Name"
-                  className={`p-3 border rounded-md w-full ${errors.firstName ? 'border-red-500' : ''}`}
+                  className={`p-3 border rounded-md w-full ${
+                    errors.firstName ? "border-red-500" : ""
+                  }`}
                   value={billingDetails.firstName}
                   onChange={handleBillingInputChange}
+                  disabled={userDetaillock}
                 />
                 <input
                   type="text"
                   name="lastName"
                   placeholder="Last Name"
-                  className={`p-3 border rounded-md w-full ${errors.lastName ? 'border-red-500' : ''}`}
+                  className={`p-3 border rounded-md w-full ${
+                    errors.lastName ? "border-red-500" : ""
+                  }`}
                   value={billingDetails.lastName}
                   onChange={handleBillingInputChange}
+                  disabled={userDetaillock}
                 />
               </div>
               <input
                 type="email"
                 name="email"
                 placeholder="Email"
-                className={`p-3 border rounded-md w-full ${errors.email ? 'border-red-500' : ''}`}
+                className={`p-3 border rounded-md w-full ${
+                  errors.email ? "border-red-500" : ""
+                } ${emailMessage !== "" ? "border-red-500" : ""}`}
                 value={billingDetails.email}
                 onChange={handleBillingInputChange}
+                disabled={userDetaillock}
               />
+              <p className="text-red-500">{emailMessage}</p>
               <input
                 type="text"
                 name="phoneNumber"
                 placeholder="Phone Number"
-                className={`p-3 border rounded-md w-full ${errors.phoneNumber ? 'border-red-500' : ''}`}
+                className={`p-3 border rounded-md w-full ${
+                  errors.phoneNumber ? "border-red-500" : ""
+                }`}
                 value={billingDetails.phoneNumber}
                 onChange={handleBillingInputChange}
+                disabled={userDetaillock}
               />
               <input
                 type="text"
                 name="address"
                 placeholder="Address"
-                className={`p-3 border rounded-md w-full ${errors.address ? 'border-red-500' : ''}`}
+                className={`p-3 border rounded-md w-full ${
+                  errors.address ? "border-red-500" : ""
+                }`}
                 value={billingDetails.address}
                 onChange={handleBillingInputChange}
               />
-              <div className="grid grid-cols-3 gap-4">
+              {/* <div className="grid grid-cols-3 gap-4">
                 <input
                   type="text"
                   name="city"
@@ -191,7 +282,7 @@ export default function Checkout() {
                   value={billingDetails.zipCode}
                   onChange={handleBillingInputChange}
                 />
-              </div>
+              </div> */}
             </form>
           </div>
 
@@ -202,16 +293,17 @@ export default function Checkout() {
               {otherPayments.map((payment) => (
                 <div
                   key={payment.id}
-                  className={`mb-4 lg:m-0 border rounded-md p-4 cursor-pointer hover:bg-gray-100 ${
-                    paymentMethod === payment.name ? 'border-blue-500' : ''
+                  className={`mb-4 lg:m-0 border flex flex-col items-center justify-center rounded-md p-4 cursor-pointer hover:bg-gray-100 ${
+                    paymentMethod === payment.name ? "border-blue-500" : ""
                   }`}
                   onClick={() => setPaymentMethod(payment.name)}
                 >
                   <Image
                     src={payment.img}
                     alt={payment.name}
-                    width={50}
-                    height={50}
+                    width={100}
+                    height={100}
+                    className="items-center justify-center"
                   />
                   <p className="text-center mt-2">{payment.name}</p>
                 </div>
@@ -233,7 +325,9 @@ export default function Checkout() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-500">Your checkout is empty.</p>
+              <p className="text-center text-gray-500">
+                Your checkout is empty.
+              </p>
             )}
 
             {/* Summary */}
@@ -253,14 +347,22 @@ export default function Checkout() {
             <hr />
             <div className="flex justify-between font-bold">
               <span>Total</span>
-              <span>${calculateTotal().toFixed(2)}</span>
+              <span>${(calculateTotal()+ taxes + shippingCost).toFixed(2)}</span>
             </div>
 
             {/* Place Order Button */}
             <button
               onClick={handlePlaceOrder}
-              className="bg-blue-500 text-white py-3 px-6 w-full rounded-md hover:bg-blue-600"
+              className="flex bg-blue-500 text-white py-3 px-6 w-full rounded-md hover:bg-blue-600"
+              disabled={loading}
             >
+              <ClipLoader
+                color="#ffffff"
+                loading={loading}
+                size={40}
+                aria-label="Loading Spinner"
+                data-testid="loader"
+              />
               Place Order
             </button>
           </div>
@@ -272,6 +374,11 @@ export default function Checkout() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-bold mb-4">Enter Transaction Number</h2>
+            <h3>your Transaction Method is {paymentMethod}</h3>
+            <h3 className="mb-2">
+              using Your {paymentMethod} transfer to +251983525923 <br /> name
+              Yohanns Guesh{" "}
+            </h3>
             <input
               type="text"
               placeholder="Transaction Number"
@@ -288,32 +395,75 @@ export default function Checkout() {
           </div>
         </div>
       )}
+
+      {/* Modal for Transaction Number */}
+      {showOrderModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6  text-center rounded-lg shadow-md">
+            <div className="text-right">
+          <button
+              onClick={() => {
+                setShowOrderModal(false);
+              }}
+              className="bg-blue-500 text-white p-1 px-2 rounded-md hover:bg-blue-600"
+            >
+              X
+            </button>
+            </div>
+            <h2 className="text-xl font-bold mb-4">Thank Your For Ordering</h2>
+            <h3>
+              Order placed with payment method: {paymentMethod} <br />{" "}
+              transaction number: {transactionNumber}
+            </h3>
+            <h3 className="font-bold">
+              your Order :{" "}
+              <Link
+                href={`/order/${transactionid}`}
+                className="text-blue-600 underline"
+              >
+                Click Here
+              </Link>
+            </h3>
+            <h3>please Check your Email For more detail</h3>
+            {/* <h3 className='mb-2'>using Your {paymentMethod} transfer to +251983525923 <br /> name Yohanns Guesh </h3> */}
+            {/* <input
+              type="text"
+              placeholder="Transaction Number"
+              value={transactionNumber}
+              onChange={(e) => setTransactionNumber(e.target.value)}
+              className="p-3 border rounded-md w-full mb-4"
+            /> */}
+            
+          </div>
+        </div>
+      )} 
+      <ToastContainer />
     </div>
   );
 }
-export async function getServerSideProps(context) {
-  const { req } = context;
-  const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
-  
-  // Check if the authToken exists
-  // if (!cookies.authToken || cookies.role !== 'admin') {
-  // console.log(cookies.role);
-  // console.log(decodeJWT(cookies.authToken))
-  
-    if (!cookies.authToken ) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  
-  // Mock user fetching logic based on authToken
-  const user = { id: cookies.authToken };
-  // const user = { id: cookies.authToken, role: cookies.role };
-  
-  return {
-    props: { user }, // Pass user data to the dashboard
-  };
-  }
+// export async function getServerSideProps(context) {
+//   const { req } = context;
+//   const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
+
+//   // Check if the authToken exists
+//   // if (!cookies.authToken || cookies.role !== 'admin') {
+//   // console.log(cookies.role);
+//   // console.log(decodeJWT(cookies.authToken))
+
+//     if (!cookies.authToken ) {
+//     return {
+//       redirect: {
+//         destination: '/login',
+//         permanent: false,
+//       },
+//     };
+//   }
+
+//   // Mock user fetching logic based on authToken
+//   const user = { id: cookies.authToken };
+//   // const user = { id: cookies.authToken, role: cookies.role };
+
+//   return {
+//     props: { user }, // Pass user data to the dashboard
+//   };
+//   }

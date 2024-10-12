@@ -105,7 +105,7 @@ export default function Header() {
                 />
                 <a href={`/search/${inputValue}`}>
                 <button
-                  className="flex-shrink-0 text-gray-500 hover:text-gray-700"
+                  className="flex-shrink-0 text-gray-500 hover:text-gray-700 mt-3"
                   // onClick={()=> {handlesearch() }}
                   type="button"
                 >

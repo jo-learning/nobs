@@ -58,7 +58,13 @@ export default function Cart() {
       const updatedCart= localCart.filter(dir => dir.id !== id);
       localStorage.setItem('cart', JSON.stringify(updatedCart))
       setCartItems(updatedCart);
-      toast.error(data.message);
+      let cartCounter = localStorage.getItem("cartcounter");
+      if (cartCounter > 0){
+        localStorage.setItem("cartcounter", parseInt(cartCounter)-1);
+        dispatch(setCartCounter(parseInt(cartCounter)-1));
+      }
+
+      toast.error("Cart Item Deleted");
     }
   };
 

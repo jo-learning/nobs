@@ -10,12 +10,14 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import en from '../locales/en/common.json';
 import ti from '../locales/ti/common.json';
+let images = ''
 
 
 export default function Home() {
   const [products, setProducts] = useState(null);
   const sliderRef = useRef(null);
   const { locale } = useRouter()
+  const router = useRouter();
   const tanslations = locale === 'en' ? en: ti;
 
   // Function to handle sliding
@@ -56,8 +58,8 @@ export default function Home() {
     <div>
       {/* Title of the Collection */}
       <div className="justify-between flex items-center px-10 mt-3">
-        <h1 className="text-center text-4xl">Categories</h1>
-        <button className="bg-purple-400 p-2 rounded-lg hover:bg-slate-500">Show more</button>
+        <h1 className="text-center text-4xl text-blue-700 font-bold">Products</h1>
+        <button onClick={()=>{router.push('/products/allproduct')}} className="bg-purple-400 p-2 rounded-lg hover:bg-slate-500">Show more</button>
       </div>
       <div className="relative max-w-full">
         {/* Left Slide Button */}
@@ -74,17 +76,6 @@ export default function Home() {
           className="flex overflow-x-scroll space-x-6 scrollbar-hide py-6 px-4"
         >
           {products.map((product, index) => (
-            // <Link key={index} href={`/productdetail/${product.id}`}>
-            //   <div className="inline-block text-black mb-3">
-            //     <Collection
-            //       imageSrc={product.image_url}
-            //       productName={product.name_en}
-            //       description={product.description_en}
-            //       price={`$${product.price}`}
-            //     />
-            //     {/* <h2 className="text-red-900">fuck you</h2> */}
-            //   </div>
-            // </Link>
             <div
             key={index}
             className="min-w-[250px] bg-white shadow-lg rounded-lg p-4 flex-shrink-0"
@@ -92,7 +83,7 @@ export default function Home() {
           <Link href={`/productdetail/${product.id}`}>
           
             <Image
-              src={product.image_url}
+              src={`/api${product.image_url[0]}`}
               alt={product.name}
               width={250}
               height={250}
@@ -106,8 +97,10 @@ export default function Home() {
                 <span className="text-yellow-500 mr-1">★</span>
                 <span className="text-gray-800 font-semibold">{4}</span>
                 </div>
-                <span className="text-gray-800 font-semibold mr-3">${product.price}</span>
+                <p className="text-gray-700 ">154 Reviews</p>
+                
               </div>
+              <span className="text-gray-800 font-semibold mr-3">${product.price}  <strike ><span className="text-gray-400">${product.price}</span></strike></span>
             </div>
           
           </Link>

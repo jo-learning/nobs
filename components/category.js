@@ -50,7 +50,7 @@ export default function Categories() {
     <div>
       {/* Title of the Collection */}
       <div className="justify-between flex items-center px-10 mt-3">
-        <h1 className="text-center text-4xl">Categories</h1>
+        <h1 className="text-center text-4xl text-blue-700 font-bold">Categories</h1>
         <button className="bg-purple-400 p-2 rounded-lg hover:bg-slate-500">Show more</button>
       </div>
       <div className="relative max-w-full">
@@ -83,7 +83,7 @@ export default function Categories() {
 
             <div
             key={index}
-            className="min-w-[250px] bg-white shadow-lg rounded-lg p-4 flex-shrink-0"
+            className="min-w-[100px] bg-white shadow-lg rounded-lg p-4 flex-shrink-0 w-[150px]"
           >
           <Link href={`/products/${categori.name_en}`}>
           
@@ -92,7 +92,7 @@ export default function Categories() {
               alt={categori.name_en}
               width={250}
               height={250}
-              className="w-[250px] h-40 object-cover rounded-md"
+              className="w-[250px] h-[90px] object-cover rounded-md"
             />
             <div className="mt-4">
               <h3 className="text-lg font-bold text-gray-800">{categori.name_en}</h3>

@@ -37,6 +37,23 @@ export default function Login() {
       // If login is successful, store the token and redirect
       // localStorage.setItem("token", data.token);
       // console.log(data.user)
+      const localCart = JSON.parse(localStorage.getItem('cart')) || [];
+      if (localCart.length !== 0){
+        for (let i = 0 ; i < localCart.length; i++){
+          const res = await fetch('/api/cart', {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({product_id: localCart[i].id, quantity: localCart[i].quantity})
+          })
+          const data = await res.json();
+
+        }
+      }
+
+      
+
       localStorage.setItem("user", JSON.stringify(data.user));
 
       localStorage.setItem("role", JSON.stringify(data.user.role))
@@ -44,6 +61,7 @@ export default function Login() {
       dispatch(setUser(data.user))
 
       toast.success(data.message);
+      setIsLoading(false);
       router.push("/dashboard"); // Redirect to a protected page after login
     } else {
       setIsLoading(false);

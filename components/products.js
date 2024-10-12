@@ -27,7 +27,7 @@ export default function Products({ items, product }) {
           <Link href={`/productdetail/${product.id}`}>
           <div className="flex items-center justify-center">
             <Image
-              src={product.image_url}
+              src={`/api${product.image_url[0]}`}
               alt={product.name}
               width={250}
               height={250}
@@ -65,7 +65,7 @@ export default function Products({ items, product }) {
           <Link href={`/productdetail/${product.id}`}>
           <div className="flex items-center justify-center">
             <Image
-              src={product.image_url}
+              src={`/api${product.image_url}`}
               alt={product.name}
               width={250}
               height={250}

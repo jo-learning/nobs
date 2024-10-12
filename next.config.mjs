@@ -6,6 +6,9 @@ const nextConfig = {
     defaultLocale: 'en',    // Set your default language
     localeDetection: false, // Disable automatic locale detection (optional)
   },
+  images: {
+    domains: ['localhost'], // or your domain in production
+  },
 };
 
 export default nextConfig;

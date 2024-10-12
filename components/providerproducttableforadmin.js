@@ -75,7 +75,7 @@ const ProductTable = () => {
             <tr key={product.id} className="border-b hover:bg-gray-50">
               <td className="px-6 py-4 text-gray-800">{product.name_en}</td>
               <td className="px-6 py-4">
-                <Image src={product.image_url} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
+                <Image src={`/api${product.image_url[0]}`} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
               </td>
               {/* <td className="px-6 py-4 text-gray-800">{product.category}</td> */}
               {isusers && (<td className="px-6 py-4 text-gray-800">{isusers[index].email}</td>)}

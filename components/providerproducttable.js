@@ -68,7 +68,7 @@ const ProductTable = () => {
               <td className="px-6 py-4 text-gray-800">{product.name_en}</td>
               <td className="px-6 py-4">
                 {/* <img src={product.image_url} alt={product.name_en} className="w-16 h-16 object-cover rounded" /> */}
-                <Image src={product.image_url} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
+                <Image src={`/api${product.image_url[0]}`} alt={product.name_en} width={40} height={40} className="w-16 h-16 object-cover rounded" />
               </td>
               {/* <td className="px-6 py-4 text-gray-800">{product.category}</td> */}
               <td className="px-6 py-4 text-gray-800">${product.price}</td>

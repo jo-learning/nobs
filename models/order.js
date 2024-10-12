@@ -1,31 +1,58 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const User = require('./user');
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/database");
+const User = require("./user");
 
-const Order = sequelize.define('Order', {
+const Order = sequelize.define(
+  "orders",
+  {
     id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
     },
     status: {
-        type: DataTypes.ENUM('pending', 'completed', 'cancelled'),
-        defaultValue: 'pending',
+      type: DataTypes.ENUM("pending", "completed", "cancelled"),
+      defaultValue: "pending",
     },
-    totalAmount: {
-        type: DataTypes.FLOAT,
-        allowNull: false,
+    total_price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
-    shippingAddress: {
-        type: DataTypes.STRING,
-        allowNull: false,
+    shipping_address: {
+      type: DataTypes.JSON,
+      allowNull: false,
     },
-}, {
+    user_id: {
+      type: DataTypes.STRING,
+      references: {
+        model: User,
+        key: "id",
+      },
+      allowNull: false,
+      onUpdate: "CASCADE",
+      onDelete: "SET NULL",
+    },
+    transaction_number: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    session: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    payment_method: {
+      type: DataTypes.ENUM("telebirr", "CBE", "OtherBanks"),
+      defaultValue: "telebirr",
+
+    },
+  },
+  {
     timestamps: true,
     underscored: true,
     createdAt: "created_at", // Customize the createdAt field name
     updatedAt: "updated_at", // Customize the updatedAt field name
-});
+  }
+);
 
-Order.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' });
+// Order.belongsTo(User, { foreignKey: "userId", onDelete: "CASCADE" });
 module.exports = Order;
