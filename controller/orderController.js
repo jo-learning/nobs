@@ -71,17 +71,17 @@ export const create = async (req, res) => {
     }
     const send = await NodeMailer({
       to: shipping_address.email,
-      subject: "Your Order Confirmation - [Order Number]",
+      subject: `Your Order Confirmation - ${newOrder.order_number}`,
       text: `Dear ${shipping_address.firstName},
 
-Thank you for shopping with us! We are excited to inform you that your order [Order Number] has been successfully received and is currently being processed.
+Thank you for shopping with us! We are excited to inform you that your order ${newOrder.order_number} has been successfully received and is currently being processed.
 Order Details:
 
-http://localhost:3000/order/${newOrder.id}
+https://test.nobsmart.com/order/${newOrder.id}
 
 You will receive another email once your order has been shipped, along with tracking details to follow its journey to your doorstep.
 
-If you have any questions regarding your order, feel free to reply to this email or contact our support team at [Support Email].
+If you have any questions regarding your order, feel free to reply to this email or contact our support team at nobsecoms@gmail.com.
 
 Thank you for choosing Nobsmart, and we hope you enjoy your purchase!
 

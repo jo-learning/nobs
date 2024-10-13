@@ -45,6 +45,11 @@ const Order = sequelize.define(
       defaultValue: "telebirr",
 
     },
+    order_number: {
+      type: DataTypes.INTEGER,
+      // allowNull: false,
+      unique: true
+    }
   },
   {
     timestamps: true,
