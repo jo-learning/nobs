@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/store/userSlice";
+import LoadingCircle from "@/components/loaddingcircle";
 
 
 export default function Signup() {
@@ -16,12 +17,57 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [error, setError] = useState(null);
+  const [emailMessage, setEmailMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const router = useRouter();
   const  { t }  = useTranslation('common');
   const dispatch = useDispatch()
+
+
+  const isValidEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
+    setEmailMessage("");
+
+
+
+    if (!isValidEmail(email)) {
+      setEmailMessage("invaild email format");
+      setLoading(false);
+      return;
+    } else {
+      setEmailMessage("");
+      const response = await fetch("/api/verifyemail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: email }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setEmailMessage("");
+        setLoading(false);
+      } else {
+        setEmailMessage("Email is invalid.");
+        setLoading(false);
+        return;
+      }
+    }
+
+
+
+
     // console.log(t.t("welcome"));
 
     // Sending login request to /api/user
@@ -99,9 +145,10 @@ export default function Signup() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="text-black w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`text-black w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${emailMessage !== "" ? "border-red-500" : ""}`}
               placeholder="Enter your email"
             />
+            <p className="text-red-500">{emailMessage}</p>
           </div>
           <div className="mb-6">
             <label
@@ -139,8 +186,10 @@ export default function Signup() {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            className="w-full flex items-center justify-center bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            disabled={loading}
           >
+            {loading && (<LoadingCircle />)}
             Sign Up
           </button>
         </form>
