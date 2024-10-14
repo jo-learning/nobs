@@ -34,7 +34,7 @@ export default function Header() {
     //   dispatch(setUser(JSON.parse(cartCounter)));
 
     // }
-    
+
     const handleCartforcounter = async () => {
       const res = await fetch("/api/cart/getcartforcounter");
       const data = await res.json();
@@ -47,8 +47,6 @@ export default function Header() {
 
     // console.log(users)
   }, []);
-
-
 
   // const handlesearch = async() =>{
   //   router.replace(`/search/${inputValue}`);
@@ -104,14 +102,13 @@ export default function Header() {
                   onChange={(e) => setInputValue(e.target.value)}
                 />
                 <a href={`/search/${inputValue}`}>
-                <button
-                  className="flex-shrink-0 text-gray-500 hover:text-gray-700 mt-3"
-                  // onClick={()=> {handlesearch() }}
-                  type="button"
-                >
-                  
-                  <FaSearch size={20} />
-                </button>
+                  <button
+                    className="flex-shrink-0 text-gray-500 hover:text-gray-700 mt-3"
+                    // onClick={()=> {handlesearch() }}
+                    type="button"
+                  >
+                    <FaSearch size={20} />
+                  </button>
                 </a>
                 <LanguageSwitcher />
               </li>
@@ -138,17 +135,20 @@ export default function Header() {
         <div>
           <ul>
             <li className="mt-2 flex sm:hidden">
-              <input className="mr-2 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-black w-full px-4 py-2 border border-gray-300 rounded-lg" />
+              <input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                className="mr-2 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-black w-full px-4 py-2 border border-gray-300 rounded-lg"
+              />
               <a href={`/search/${inputValue}`}>
                 <button
                   className="flex-shrink-0 text-gray-500 hover:text-gray-700 mt-3"
                   // onClick={()=> {handlesearch() }}
                   type="button"
                 >
-                  
                   <FaSearch size={20} />
                 </button>
-                </a>
+              </a>
             </li>
           </ul>
         </div>

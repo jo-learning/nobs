@@ -143,6 +143,17 @@ export default function Layout({ children }) {
               </ul>
             )}
             <li>
+              <Link href="/dashboard/order">
+                <span
+                  className={clsx("block py-2 px-4 hover:bg-gray-700", {
+                    "bg-slate-600": pathname === "/dashboard/order",
+                  })}
+                >
+                  Orders
+                </span>
+              </Link>
+            </li>
+            <li>
               <Link href="/dashboard/userrequest">
                 <span
                   className={clsx("block py-2 px-4 hover:bg-gray-700", {

@@ -5,6 +5,7 @@ import { Op } from "sequelize";
 import Transaction from "@/models/transaction";
 import NodeMailer from "@/config/nodemailer";
 import cart from "@/pages/api/cart";
+import User from "@/models/user";
 export const create = async (req, res) => {
   if (req.method !== "POST") {
     return res.status(405).json({ message: "Only POST method allowed" });
@@ -69,12 +70,14 @@ export const create = async (req, res) => {
     if (checkTransaction) {
       const updateOrder = await Order.update({ status: "completed" },{where: {id: order_id}});
     }
+
+    const ordern = await Order.findOne({where:{id:order_id}})
     const send = await NodeMailer({
       to: shipping_address.email,
-      subject: `Your Order Confirmation - ${newOrder.order_number}`,
+      subject: `Your Order Confirmation - ${ordern.order_number}`,
       text: `Dear ${shipping_address.firstName},
 
-Thank you for shopping with us! We are excited to inform you that your order ${newOrder.order_number} has been successfully received and is currently being processed.
+Thank you for shopping with us! We are excited to inform you that your order ${ordern.order_number} has been successfully received and is currently being processed.
 Order Details:
 
 https://test.nobsmart.com/order/${newOrder.id}
@@ -121,7 +124,33 @@ export const getOrder = async (req, res) => {
   }
 };
 
+
+
+export const getAllOrder = async (req, res) => {
+  if (req.method !== 'GET') {
+      return res.status(405).json({ message: 'Only GET method allowed' });
+  }
+
+
+  try {
+      // Get all the Categories
+      console.log(req.user.role)
+      const allOrder = await Order.findAll();
+      // const user = await User.findOne({where: {id: allOrder.user_id}})
+
+      res.status(200).json({
+          message: 'All Order',
+          allOrder,
+          // user
+      });
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export default {
   create,
   getOrder,
+  getAllOrder
 };

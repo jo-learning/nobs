@@ -8,6 +8,10 @@ const OrderDetails = () => {
   const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
+    const cookies = async()=>{
+      const res = await fetch('/api/setuser')
+    }
+    cookies();
     if (id) {
       // Fetch the order details using the id
       fetchOrderDetails(id);

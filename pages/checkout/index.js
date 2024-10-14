@@ -26,12 +26,17 @@ export default function Checkout() {
   const [userDetaillock, setUserDetailLock] = useState(false);
   const shippingCost = 5.99;
   const taxes = 2.5;
+  const [isChecked, setIsChecked] = useState(false);
 
   const otherPayments = [
     { id: 1, name: "Telebirr", img: "/images/telebirr.jpeg" },
     { id: 2, name: "CBE", img: "/images/CBE.jpeg" },
     { id: 3, name: "Other Banks", img: "/bitcoin.png" },
   ];
+
+  const handleCheckboxChange = (e) => {
+    setIsChecked(e.target.checked);
+  };
 
   // Function to calculate the total price
   const calculateTotal = () => {
@@ -158,7 +163,7 @@ export default function Checkout() {
   // Handle confirming transaction number
   const handleConfirmTransaction = async () => {
     if (transactionNumber) {
-      setLoading(true)
+      setLoading(true);
       const res = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -179,16 +184,16 @@ export default function Checkout() {
         setTransactionId(data.transaction_id.id);
         setShowTransactionModal(false);
         setShowOrderModal(true);
-        setLoading(false)
+        setLoading(false);
       } else {
         toast.error(data.message);
         setShowTransactionModal(false);
-        setLoading(false)
+        setLoading(false);
       }
     } else {
       alert("Please enter a transaction number.");
       setShowTransactionModal(false);
-      setLoading(false)
+      setLoading(false);
     }
     // Proceed with the order
   };
@@ -323,7 +328,7 @@ export default function Checkout() {
             {/* Items */}
             {cartItems.length > 0 ? (
               cartItems.map((cart) => (
-                <div key={cart.id} className="flex justify-between">
+                <div key={cart.id} className="flex justify-between pb-2">
                   <span>{cart.name}</span>
                   <span>${cart.quantity * cart.price}</span>
                 </div>
@@ -333,6 +338,11 @@ export default function Checkout() {
                 Your checkout is empty.
               </p>
             )}
+
+            <label className="font-bold bg-blue-600 m-3 p-2 text-white rounded-lg">
+              <input type="checkbox" onChange={handleCheckboxChange} className="mr-3" />
+              Shipping
+            </label>
 
             {/* Summary */}
             <hr />
@@ -344,14 +354,24 @@ export default function Checkout() {
               <span>Taxes</span>
               <span>${taxes.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>${shippingCost.toFixed(2)}</span>
-            </div>
+            {isChecked && (
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span>${shippingCost.toFixed(2)}</span>
+              </div>
+            )}
+
             <hr />
             <div className="flex justify-between font-bold">
               <span>Total</span>
-              <span>${(calculateTotal()+ taxes + shippingCost).toFixed(2)}</span>
+              <span>
+                $
+                {(
+                  calculateTotal() +
+                  taxes +
+                  (isChecked ? shippingCost : 0)
+                ).toFixed(2)}
+              </span>
             </div>
 
             {/* Place Order Button */}
@@ -395,7 +415,7 @@ export default function Checkout() {
               className="bg-blue-500 text-white py-3 px-6 w-full rounded-md hover:bg-blue-600"
               disabled={loading}
             >
-            <ClipLoader
+              <ClipLoader
                 color="#ffffff"
                 loading={loading}
                 size={35}
@@ -413,14 +433,14 @@ export default function Checkout() {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6  text-center rounded-lg shadow-md">
             <div className="text-right">
-          <button
-              onClick={() => {
-                setShowOrderModal(false);
-              }}
-              className="bg-blue-500 text-white p-1 px-2 rounded-md hover:bg-blue-600"
-            >
-              X
-            </button>
+              <button
+                onClick={() => {
+                  setShowOrderModal(false);
+                }}
+                className="bg-blue-500 text-white p-1 px-2 rounded-md hover:bg-blue-600"
+              >
+                X
+              </button>
             </div>
             <h2 className="text-xl font-bold mb-4">Thank Your For Ordering</h2>
             <h3>
@@ -445,10 +465,9 @@ export default function Checkout() {
               onChange={(e) => setTransactionNumber(e.target.value)}
               className="p-3 border rounded-md w-full mb-4"
             /> */}
-            
           </div>
         </div>
-      )} 
+      )}
       <ToastContainer />
     </div>
   );
